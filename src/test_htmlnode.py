@@ -1,6 +1,7 @@
 import unittest
 
-from htmlnode import HTMLNode, LeafNode, ParentNode
+from htmlnode import HTMLNode, LeafNode, ParentNode, text_node_to_html
+from textnode import TextNode
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -20,7 +21,7 @@ class TestHTMLNode(unittest.TestCase):
         node = HTMLNode(
             "div", "Hello, world!", None, {"class": "my-class", "id": "my-id"}
         )
-        self.assertEqual(node.props_to_html(), " class=my-class id=my-id")
+        self.assertEqual(node.props_to_html(), f' class="my-class" id="my-id"')
 
     def test_blank_props_to_html(self):
         node = HTMLNode("div", None, None, None)
@@ -152,6 +153,23 @@ class TestHTMLNode(unittest.TestCase):
         self.assertEqual(
             node.to_html(),
             "<h2><b>Bold text</b>Normal text<i>italic text</i>Normal text</h2>",
+        )
+
+    def test_convert_text_node_to_html(self):
+        node = TextNode("This is a text node", "bold")
+        leaf_node = text_node_to_html(node)
+        self.assertEqual(leaf_node.tag, "b")
+        self.assertEqual(leaf_node.value, "This is a text node")
+        self.assertEqual(leaf_node.to_html(), "<b>This is a text node</b>")
+
+    def test_convert_text_node_to_html_with_url(self):
+        node = TextNode("This is a text node", "link", "https://example.com")
+        leaf_node = text_node_to_html(node)
+        self.assertEqual(leaf_node.tag, "a")
+        self.assertEqual(leaf_node.value, "This is a text node")
+        self.assertEqual(leaf_node.props["href"], "https://example.com")
+        self.assertEqual(
+            leaf_node.to_html(), '<a href="https://example.com">This is a text node</a>'
         )
 
 

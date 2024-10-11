@@ -13,7 +13,7 @@ class HTMLNode:
             return ""
         props_html = ""
         for prop in self.props:
-            props_html += f" {prop}={self.props[prop]}"
+            props_html += f' {prop}="{self.props[prop]}"'
         return props_html
 
     def __repr__(self):
@@ -54,3 +54,21 @@ class ParentNode(HTMLNode):
 
     def __repr__(self):
         return f"ParentNode({self.tag}, {self.children}, {self.props})"
+
+
+def text_node_to_html(text_node):
+    match text_node.text_type:
+        case "text":
+            return LeafNode(None, text_node.text)
+        case "bold":
+            return LeafNode("b", text_node.text)
+        case "italic":
+            return LeafNode("i", text_node.text)
+        case "code":
+            return LeafNode("code", text_node.text)
+        case "link":
+            return LeafNode("a", text_node.text, {"href": text_node.url})
+        case "image":
+            return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
+        case _:
+            raise ValueError(f"Unknown text type: {text_node.text_type}")
