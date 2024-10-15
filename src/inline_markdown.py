@@ -20,3 +20,13 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                 split_nodes.append(TextNode(sections[i], text_type))
         new_nodes.extend(split_nodes)
     return new_nodes
+
+
+def extract_markdown_images(text):
+    return [
+        node
+        for node in split_nodes_delimiter(
+            [TextNode(text, TextType.TEXT)], "![", TextType.IMAGE
+        )
+        if node.text_type == TextType.IMAGE.value
+    ]
