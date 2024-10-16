@@ -1,6 +1,6 @@
 import unittest
 from inline_markdown import (
-    split_nodes_delimiter,
+    split_nodes_delimiter, extract_markdown_images, extract_markdown_links
 )
 
 from textnode import TextNode, TextType
@@ -85,7 +85,35 @@ class TestInlineMarkdown(unittest.TestCase):
             ],
             new_nodes,
         )
+class TestMarkdownExtraction(unittest.TestCase):
 
+    def test_extract_markdown_images(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        expected = [("rick roll", "https://i.imgur.com/aKaOqIh.gif"), ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")]
+        self.assertEqual(extract_markdown_images(text), expected)
+
+        # Test with no images
+        self.assertEqual(extract_markdown_images("No images here"), [])
+
+        # Test with one image
+        self.assertEqual(extract_markdown_images("![alt](url)"), [("alt", "url")])
+
+        # Test with image in the middle of text
+        self.assertEqual(extract_markdown_images("Before ![alt](url) After"), [("alt", "url")])
+
+    def test_extract_markdown_links(self):
+        text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+        expected = [("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com/@bootdotdev")]
+        self.assertEqual(extract_markdown_links(text), expected)
+
+        # Test with no links
+        self.assertEqual(extract_markdown_links("No links here"), [])
+
+        # Test with one link
+        self.assertEqual(extract_markdown_links("[anchor](url)"), [("anchor", "url")])
+
+        # Test with link in the middle of text
+        self.assertEqual(extract_markdown_links("Before [anchor](url) After"), [("anchor", "url")])
 
 if __name__ == "__main__":
     unittest.main()
