@@ -77,6 +77,14 @@ def split_nodes_link(old_nodes):
     return new_nodes
 
 
+def text_to_textnodes(text):
+    node = TextNode(text, TextType.TEXT)
+    new_nodes = []
+    for type in TextType:
+        new_nodes.append(split_nodes_delimiter([node], "`", type))
+    return new_nodes
+
+
 def extract_markdown_images(text):
     pattern = r"!\[([^\]]*)\]\(([^)]+)\)"
     matches = re.findall(pattern, text)
@@ -87,4 +95,3 @@ def extract_markdown_links(text):
     pattern = r"\[([^\]]+)\]\(([^)]+)\)"
     matches = re.findall(pattern, text)
     return [(anchor_text, url) for anchor_text, url in matches]
-
