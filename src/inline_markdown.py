@@ -78,11 +78,24 @@ def split_nodes_link(old_nodes):
 
 
 def text_to_textnodes(text):
-    node = TextNode(text, TextType.TEXT)
-    new_nodes = []
-    for type in TextType:
-        new_nodes.append(split_nodes_delimiter([node], "`", type))
-    return new_nodes
+    nodes = [TextNode(text, TextType.TEXT)]
+
+    # Process bold text
+    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+
+    # Process italic text
+    nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC)
+
+    # Process code blocks
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+
+    # Process images
+    nodes = split_nodes_image(nodes)
+
+    # Process links
+    nodes = split_nodes_link(nodes)
+
+    return nodes
 
 
 def extract_markdown_images(text):
