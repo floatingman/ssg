@@ -213,6 +213,77 @@ class TestMarkdownExtraction(unittest.TestCase):
         actual = text_to_textnodes(text)
         self.assertListEqual(expected, actual)
 
+    def test_simple_text(self):
+        text = "This is just plain text"
+        expected = [TextNode("This is just plain text", TextType.TEXT)]
+        actual = text_to_textnodes(text)
+        self.assertEqual(actual, expected)
+
+    def test_bold_only(self):
+        text = "This is **bold** text"
+        expected = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" text", TextType.TEXT),
+        ]
+        actual = text_to_textnodes(text)
+        self.assertEqual(actual, expected)
+
+    def test_italic_only(self):
+        text = "This is *italic* text"
+        expected = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" text", TextType.TEXT),
+        ]
+        actual = text_to_textnodes(text)
+        self.assertEqual(actual, expected)
+
+    def test_code_only(self):
+        text = "This is `code` text"
+        expected = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("code", TextType.CODE),
+            TextNode(" text", TextType.TEXT),
+        ]
+        actual = text_to_textnodes(text)
+        self.assertEqual(actual, expected)
+
+    def test_link_only(self):
+        text = "This is a [link](https://example.com) in text"
+        expected = [
+            TextNode("This is a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://example.com"),
+            TextNode(" in text", TextType.TEXT),
+        ]
+        actual = text_to_textnodes(text)
+        self.assertEqual(actual, expected)
+
+    def test_image_only(self):
+        text = "This is an ![image](https://example.com/image.jpg) in text"
+        expected = [
+            TextNode("This is an ", TextType.TEXT),
+            TextNode("image", TextType.IMAGE, "https://example.com/image.jpg"),
+            TextNode(" in text", TextType.TEXT),
+        ]
+        actual = text_to_textnodes(text)
+        self.assertEqual(actual, expected)
+
+    def test_multiple_formatting(self):
+        text = "**Bold** *italic* `code` [link](https://example.com) ![image](https://example.com/image.jpg)"
+        expected = [
+            TextNode("Bold", TextType.BOLD),
+            TextNode(" ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" ", TextType.TEXT),
+            TextNode("code", TextType.CODE),
+            TextNode(" ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://example.com"),
+            TextNode(" ", TextType.TEXT),
+            TextNode("image", TextType.IMAGE, "https://example.com/image.jpg"),
+        ]
+        actual = text_to_textnodes(text)
+        self.assertEqual(actual, expected)
 
 if __name__ == "__main__":
     unittest.main()
