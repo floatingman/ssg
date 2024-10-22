@@ -1,5 +1,5 @@
 import unittest
-from markdown_blocks import markdown_to_blocks
+from markdown_blocks import markdown_to_blocks, block_to_block_type
 
 class TestMarkdownToBlocks(unittest.TestCase):
 
@@ -45,6 +45,46 @@ class TestMarkdownToBlocks(unittest.TestCase):
         expected = ["First block", "Second block"]
         self.assertEqual(markdown_to_blocks(markdown), expected)
 
+class TestBlockToBlockType(unittest.TestCase):
+
+    def test_heading(self):
+        self.assertEqual(block_to_block_type("# Heading 1"), "heading")
+        self.assertEqual(block_to_block_type("## Heading 2"), "heading")
+        self.assertEqual(block_to_block_type("###### Heading 6"), "heading")
+        self.assertEqual(block_to_block_type("####### Not a heading"), "paragraph")
+
+    def test_code_block(self):
+        self.assertEqual(block_to_block_type("```\ncode here\n```"), "code")
+        self.assertEqual(block_to_block_type("```python\ndef function():\n    pass\n```"), "code")
+        self.assertEqual(block_to_block_type("```\nMulti-line\ncode block\n```"), "code")
+
+    def test_quote(self):
+        self.assertEqual(block_to_block_type("> This is a quote"), "quote")
+        self.assertEqual(block_to_block_type("> Multi-line\n> quote block"), "quote")
+        self.assertEqual(block_to_block_type("Not a > quote"), "paragraph")
+
+    def test_unordered_list(self):
+        self.assertEqual(block_to_block_type("* Item 1\n* Item 2"), "unordered_list")
+        self.assertEqual(block_to_block_type("- Item 1\n- Item 2"), "unordered_list")
+        self.assertEqual(block_to_block_type("* Mixed\n- List items"), "unordered_list")
+        self.assertEqual(block_to_block_type("*Not a list item"), "paragraph")
+
+    def test_ordered_list(self):
+        self.assertEqual(block_to_block_type("1. First item\n2. Second item"), "ordered_list")
+        self.assertEqual(block_to_block_type("1. First\n2. Second\n3. Third"), "ordered_list")
+        self.assertEqual(block_to_block_type("1. First\n3. Third"), "paragraph")
+        self.assertEqual(block_to_block_type("1. First\n2. Second\n2. Second again"), "paragraph")
+
+    def test_paragraph(self):
+        self.assertEqual(block_to_block_type("This is a normal paragraph."), "paragraph")
+        self.assertEqual(block_to_block_type("Multi-line\nparagraph\nblock"), "paragraph")
+        self.assertEqual(block_to_block_type("Paragraph with **bold** and *italic*."), "paragraph")
+
+    def test_edge_cases(self):
+        self.assertEqual(block_to_block_type(""), "paragraph")
+        self.assertEqual(block_to_block_type("  "), "paragraph")
+        self.assertEqual(block_to_block_type("1. Not an ordered list\nBecause this line isn't numbered"), "paragraph")
+        self.assertEqual(block_to_block_type("* Not an unordered list\nBecause this line doesn't start with *"), "paragraph")
 
 
 if __name__ == "__main__":
