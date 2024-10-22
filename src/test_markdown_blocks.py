@@ -1,5 +1,5 @@
 import unittest
-from markdown_blocks import markdown_to_blocks, block_to_block_type
+from markdown_blocks import markdown_to_blocks, block_to_block_type, extract_title
 
 class TestMarkdownToBlocks(unittest.TestCase):
 
@@ -86,6 +86,33 @@ class TestBlockToBlockType(unittest.TestCase):
         self.assertEqual(block_to_block_type("1. Not an ordered list\nBecause this line isn't numbered"), "paragraph")
         self.assertEqual(block_to_block_type("* Not an unordered list\nBecause this line doesn't start with *"), "paragraph")
 
+
+class TestExtractTitle(unittest.TestCase):
+
+    def test_simple_title(self):
+        markdown = "# Hello"
+        self.assertEqual(extract_title(markdown), "Hello")
+
+    def test_title_with_spaces(self):
+        markdown = "#    Title with spaces    "
+        self.assertEqual(extract_title(markdown), "Title with spaces")
+
+    def test_title_with_other_content(self):
+        markdown = "# Main Title\n\nSome content\n## Subtitle"
+        self.assertEqual(extract_title(markdown), "Main Title")
+
+    def test_title_not_at_start(self):
+        markdown = "Some content\n# Main Title\nMore content"
+        self.assertEqual(extract_title(markdown), "Main Title")
+
+    def test_no_title(self):
+        markdown = "Just some content\nWithout a title"
+        with self.assertRaises(ValueError):
+            extract_title(markdown)
+
+    def test_multiple_titles(self):
+        markdown = "# First Title\n## Subtitle\n# Second Title"
+        self.assertEqual(extract_title(markdown), "First Title")
 
 if __name__ == "__main__":
     unittest.main()

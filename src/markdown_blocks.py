@@ -145,3 +145,25 @@ def block_to_html_node(block):
     if block_type == block_type_quote:
         return quote_to_html_node(block)
     raise ValueError("Invalid block type")
+
+def extract_title(markdown):
+    """
+    Extract the h1 header from a markdown string.
+    
+    Args:
+    markdown (str): The markdown content
+
+    Returns:
+    str: The extracted title
+
+    Raises:
+    ValueError: If no h1 header is found
+    """
+    # Use regex to find the first h1 header
+    match = re.search(r'^#\s+(.+)$', markdown, re.MULTILINE)
+    
+    if match:
+        # Return the captured group (everything after '# ')
+        return match.group(1).strip()
+    else:
+        raise ValueError("No h1 header found in the markdown content")
